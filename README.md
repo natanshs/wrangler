@@ -163,7 +163,14 @@ These directives are currently available:
 | [DDL](wrangler-docs/functions/ddl-functions.md)                                 | Functions that can manipulate definition of data                 |
 | [JSON](wrangler-docs/functions/json-functions.md)                               | Functions that can be useful in transforming your data           |
 | [Types](wrangler-docs/functions/type-functions.md)                              | Functions for detecting the type of data                         |
+## Byte Size and Time Duration Parsers
 
+The Wrangler library now supports native parsing of byte sizes and time durations within directives.
+
+### Byte Size Units
+
+Byte sizes can be specified with the following units:
+- B
 ## Performance
 
 Initial performance tests show that with a set of directives of high complexity for

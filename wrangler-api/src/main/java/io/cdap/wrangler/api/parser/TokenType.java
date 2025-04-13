@@ -136,6 +136,13 @@ public enum TokenType implements Serializable {
    *   prop:{ <key>=<value>[,<key>=<value>]*}
    * </code>
    */
+  
+  BYTE_SIZE,  // Added for byte size support
+
+  
+  TIME_DURATION,  // Added for time duration support
+
+  
   PROPERTIES,
 
   /**

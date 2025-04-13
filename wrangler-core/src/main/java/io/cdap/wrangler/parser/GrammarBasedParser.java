@@ -66,38 +66,29 @@ public class GrammarBasedParser implements RecipeParser {
    *
    * @return List of {@link Directive}.
    */
+
   @Override
-  public List<Directive> parse() throws RecipeException {
-    AtomicInteger directiveIndex = new AtomicInteger();
-    try {
-      List<Directive> result = new ArrayList<>();
-
-      new GrammarWalker(new RecipeCompiler(), context).walk(recipe, (command, tokenGroup) -> {
-        directiveIndex.getAndIncrement();
-        DirectiveInfo info = registry.get(namespace, command);
-        if (info == null) {
-          throw new DirectiveNotFoundException(
-            String.format("Directive '%s' not found in system and user scope. Check the name of directive.", command)
-          );
-        }
-
-        try {
-          Directive directive = info.instance();
-          UsageDefinition definition = directive.define();
-          Arguments arguments = new MapArguments(definition, tokenGroup);
-          directive.initialize(arguments);
-          result.add(directive);
-
-        } catch (IllegalAccessException | InstantiationException e) {
-          throw new DirectiveLoadException(e.getMessage(), e);
-        }
-      });
-
-      return result;
-    } catch (DirectiveLoadException | DirectiveNotFoundException | DirectiveParseException e) {
-      throw new RecipeException(e.getMessage(), e, directiveIndex.get());
-    } catch (Exception e) {
-      throw new RecipeException(e.getMessage(), e);
+public TokenGroup visitValue(DirectivesParser.ValueContext ctx) {
+  TokenGroup tokenGroup = new TokenGroup();
+  if (ctx.STRING() != null) {
+    String text = ctx.STRING().getText();
+    // Remove the quotes at the beginning and end
+    if (text.startsWith("'") && text.endsWith("'")) {
+      text = text.substring(1, text.length() - 1).replace("''", "'");
+    } else if (text.startsWith("\"") && text.endsWith("\"")) {
+      text = text.substring(1, text.length() - 1).replace("\"\"", "\"");
     }
+    Token token = new Text(text);
+    tokenGroup.add(token);
+  } else if (ctx.NUMBER() != null) {
+    Numeric numeric = new Numeric(ctx.NUMBER().getText());
+    tokenGroup.add(numeric);
+  } else if (ctx.BYTE_SIZE() != null) {
+    ByteSize byteSize = new ByteSize(ctx.BYTE_SIZE().getText());
+    tokenGroup.add(byteSize);
+  } else if (ctx.TIME_DURATION() != null) {
+    TimeDuration timeDuration = new TimeDuration(ctx.TIME_DURATION().getText());
+    tokenGroup.add(timeDuration);
   }
+  return tokenGroup;
 }
